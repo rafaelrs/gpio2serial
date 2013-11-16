@@ -89,8 +89,10 @@ bool MainWindow::event(QEvent* event)
         } else if (postedEvent->type() == "rs232") {
             showRS232Image(postedEvent->value(), postedEvent->port());
         } else if (postedEvent->type() == "showStat") {
-            qDebug() << postedEvent->value();
             ui->labelStatus->setText(postedEvent->value());
+        } else if (postedEvent->type() == "fatalAbort") {
+            threadMain.wait();
+            delete ui;
         }
 
         return true;

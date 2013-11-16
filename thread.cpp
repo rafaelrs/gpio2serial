@@ -31,8 +31,8 @@ void Thread::run()
         while (!stopped) {
             WAITFORPROC(gpio128_path);
             //qDebug() << "GPIO state: " << readFromFile(gpio128_path);
-            writeToFile(gpio128_path, "0");
-            qDebug() << "Returning GPIO state: " << readFromFile(gpio128_path);
+//            writeToFile(gpio128_path, "0");
+//            qDebug() << "Returning GPIO state: " << readFromFile(gpio128_path);
             sendSignal("gpio", 0, gpio128_1);
 
             qDebug() << "Waiting for " << delayAT1 <<" mseconds";
@@ -51,8 +51,8 @@ void Thread::run()
             qDebug() << "Sending STOP to RS232SC0";
             writeToFile(RS232SC0_path, SC0_stop_button1);
             sendSignal("rs232", 0, RS232SC0_stop);
-            writeToFile(gpio130_path, "0");
-            qDebug() << "Returning GPIO state: " << readFromFile(gpio130_path);
+//            writeToFile(gpio130_path, "0");
+//            qDebug() << "Returning GPIO state: " << readFromFile(gpio130_path);
             sendSignal("gpio", 2, gpio130_0);
         }
         break;
@@ -109,7 +109,7 @@ void Thread::run()
 
 bool Thread::waitForGPIO(const QString &gpio_path)
 {
-    //qDebug() << "Entering to wait loop for " << gpio_path;
+    qDebug() << "Entering to wait loop for " << gpio_path;
     sendSignal("showStat", 0, "Entering to wait loop for " + gpio_path);
     while (readFromFile(gpio_path) == "0") {
         if (stopped) return false;
@@ -124,6 +124,12 @@ void Thread::sendSignal(const QString &op_type, const int &port_number, const QS
     QCoreApplication::postEvent(parent(), myEvent);
 }
 
+void Thread::sendSignal(const QString &op_type)
+{
+    MyEvent* myEvent = new MyEvent(op_type, 0, "");
+    QCoreApplication::postEvent(parent(), myEvent);
+}
+
 QString Thread::readFromFile(const QString &filename)
 {
     QFile gpioFile(filename);
@@ -132,6 +138,10 @@ QString Thread::readFromFile(const QString &filename)
         QString fileContent = gpioStream.read(1);
         gpioFile.close();
         return fileContent;
+    } else {
+//        qDebug() << "Can't to open file " << filename;
+//        stopped = true;
+//        sendSignal("fatalAbort");
     }
 
     return "";

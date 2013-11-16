@@ -98,6 +98,7 @@ private:
     unsigned long delayAT3;
 
     void sendSignal(const QString &op_type, const int &port_number, const QString &event_par);
+    void sendSignal(const QString &op_type);
     bool waitForGPIO(const QString &gpio_path);
 };
 
