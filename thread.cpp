@@ -152,7 +152,7 @@ void Thread::writeToFile(const QString &filename, const QString &fileContent)
 void Thread::stop()
 {
     stopped = true;
-    sendSignal("showStat", NULL, "");
+    sendSignal("showStat", 0, "");
 }
 
 void Thread::writeSettings()
