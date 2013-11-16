@@ -116,7 +116,7 @@ bool Thread::waitForGPIO(const QString &gpio_path)
     while (readFromFile(gpio_path) == "0") {
         if (stopped) return false;
     }
-    sendSignal("showStat", 0, "");
+//    sendSignal("showStat", 0, "");
     return true;
 }
 
