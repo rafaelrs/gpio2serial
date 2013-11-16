@@ -1,3 +1,6 @@
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
@@ -6,6 +9,7 @@
 #include "myevent.h"
 #include "mainwindow.h"
 #include <QCoreApplication>
+using namespace std;
 
 #define WAITFORPROC(waitSignal) if (!waitForGPIO(waitSignal)) continue
 
@@ -111,11 +115,28 @@ bool Thread::waitForGPIO(const QString &gpio_path)
 {
     qDebug() << "Entering to wait loop for " << gpio_path;
     sendSignal("showStat", 0, "Entering to wait loop for " + gpio_path);
-    while (readFromFile(gpio_path) == "0") {
+    while (readFromGPIO(gpio_path) == "0") {
         if (stopped) return false;
     }
     //sendSignal("showStat", 0, "");
     return true;
+}
+
+QString Thread::readFromGPIO(const QString &filename)
+{
+    char ch;
+    ifstream gpioFile(filename.toAscii());
+    if (!gpioFile) {
+        //        qDebug() << "Can't to open file " << filename;
+        //        stopped = true;
+        //        sendSignal("fatalAbort");
+        return "";
+    }
+    gpioFile.get(ch);
+
+    QString fileContent(1, ch);
+    return fileContent;
+
 }
 
 void Thread::sendSignal(const QString &op_type, const int &port_number, const QString &event_par)

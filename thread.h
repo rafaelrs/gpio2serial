@@ -14,12 +14,6 @@ public:
     void run();
     void stop();
 
-    void writeSettings();
-    void readSettings();
-
-    QString readFromFile(const QString &filename);
-    void writeToFile(const QString &filename, const QString &fileContent);
-
 private:
     int algorithmNumber;
     volatile bool stopped;
@@ -99,7 +93,15 @@ private:
 
     void sendSignal(const QString &op_type, const int &port_number, const QString &event_par);
     void sendSignal(const QString &op_type);
+
     bool waitForGPIO(const QString &gpio_path);
+    QString readFromGPIO(const QString &filename);
+
+    void writeSettings();
+    void readSettings();
+
+    QString readFromFile(const QString &filename);
+    void writeToFile(const QString &filename, const QString &fileContent);
 };
 
 #endif // THREAD_H
