@@ -110,13 +110,11 @@ void Thread::run()
 bool Thread::waitForGPIO(const QString &gpio_path)
 {
     //qDebug() << "Entering to wait loop for " << gpio_path;
-//    std::stringstream stateStr;
-//    stateStr << "Entering to wait loop for " << gpio_path;
     sendSignal("showStat", 0, "Entering to wait loop for " + gpio_path);
     while (readFromFile(gpio_path) == "0") {
         if (stopped) return false;
     }
-//    sendSignal("showStat", 0, "");
+    //sendSignal("showStat", 0, "");
     return true;
 }
 
@@ -131,7 +129,7 @@ QString Thread::readFromFile(const QString &filename)
     QFile gpioFile(filename);
     if (gpioFile.open(QIODevice::ReadOnly)) {
         QTextStream gpioStream(&gpioFile);
-        QString fileContent = gpioStream.readAll();
+        QString fileContent = gpioStream.read(1);
         gpioFile.close();
         return fileContent;
     }
