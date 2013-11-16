@@ -4,15 +4,12 @@
 #include <QThread>
 #include <QGraphicsScene>
 #include "myevent.h"
-#include <QSettings>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    QSettings conf("gpio2serial", "gpio2serial");
-    ui->labelConfigPath->setText(conf.fileName());
 }
 
 MainWindow::~MainWindow()
