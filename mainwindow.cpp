@@ -88,6 +88,9 @@ bool MainWindow::event(QEvent* event)
             showGPIOImage(postedEvent->value(), postedEvent->port());
         } else if (postedEvent->type() == "rs232") {
             showRS232Image(postedEvent->value(), postedEvent->port());
+        } else if (postedEvent->type() == "showStat") {
+            qDebug() << postedEvent->value();
+            ui->labelStatus->setText(postedEvent->value());
         }
 
         return true;

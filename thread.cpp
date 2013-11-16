@@ -109,10 +109,14 @@ void Thread::run()
 
 bool Thread::waitForGPIO(const QString &gpio_path)
 {
-    qDebug() << "Entering to wait loop for " << gpio_path;
+    //qDebug() << "Entering to wait loop for " << gpio_path;
+//    std::stringstream stateStr;
+//    stateStr << "Entering to wait loop for " << gpio_path;
+    sendSignal("showStat", 0, "Entering to wait loop for " + gpio_path);
     while (readFromFile(gpio_path) == "0") {
         if (stopped) return false;
     }
+    sendSignal("showStat", 0, "");
     return true;
 }
 
@@ -148,6 +152,7 @@ void Thread::writeToFile(const QString &filename, const QString &fileContent)
 void Thread::stop()
 {
     stopped = true;
+    sendSignal("showStat", NULL, "");
 }
 
 void Thread::writeSettings()
