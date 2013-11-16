@@ -63,11 +63,42 @@ private:
     QString RS232SC2_stop;
     QString RS232SC3_stop;
 
+    QString SC0_start_button1;
+    QString SC1_start_button1;
+    QString SC2_start_button1;
+    QString SC3_start_button1;
+
+    QString SC0_stop_button1;
+    QString SC1_stop_button1;
+    QString SC2_stop_button1;
+    QString SC3_stop_button1;
+
+    QString SC0_start_button2;
+    QString SC1_start_button2;
+    QString SC2_start_button2;
+    QString SC3_start_button2;
+
+    QString SC0_stop_button2;
+    QString SC1_stop_button2;
+    QString SC2_stop_button2;
+    QString SC3_stop_button2;
+
+    QString SC0_start_button3;
+    QString SC1_start_button3;
+    QString SC2_start_button3;
+    QString SC3_start_button3;
+
+    QString SC0_stop_button3;
+    QString SC1_stop_button3;
+    QString SC2_stop_button3;
+    QString SC3_stop_button3;
+
     unsigned long delayAT1;
     unsigned long delayAT2;
     unsigned long delayAT3;
 
     void sendSignal(const QString &op_type, const int &port_number, const QString &event_par);
+    bool waitForGPIO(const QString &gpio_path);
 };
 
 #endif // THREAD_H

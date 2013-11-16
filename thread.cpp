@@ -7,6 +7,8 @@
 #include "mainwindow.h"
 #include <QCoreApplication>
 
+#define WAITFORPROC(waitSignal) if (!waitForGPIO(waitSignal)) continue
+
 struct MyThread : public QThread { using QThread::msleep;};
 
 Thread::Thread()
@@ -23,70 +25,95 @@ void Thread::run()
 {
     stopped = false;
 
+    qDebug() << "Selected algorithm " << algorithmNumber;
     switch (algorithmNumber) {
     case 1:
         while (!stopped) {
-            qDebug() << "Entering to wait loop. Selected algorithm 1";
-            while (readFromFile(gpio128_path) == "0") {
-                if (stopped) return;
-            }
-            qDebug() << "GPIO state: " << readFromFile(gpio128_path);
-            qDebug() << gpio128_path;
-            sendSignal("gpio", 0, gpio128_1);
-
+            WAITFORPROC(gpio128_path);
+            //qDebug() << "GPIO state: " << readFromFile(gpio128_path);
             writeToFile(gpio128_path, "0");
             qDebug() << "Returning GPIO state: " << readFromFile(gpio128_path);
+            sendSignal("gpio", 0, gpio128_1);
+
             qDebug() << "Waiting for " << delayAT1 <<" mseconds";
             MyThread::msleep(delayAT1);
-            qDebug() << "Sending START to RS232";
-            writeToFile(RS232SC0_path, "START");
+
+            qDebug() << "Sending START to RS232SC0";
+            writeToFile(RS232SC0_path, SC0_start_button1);
             sendSignal("gpio", 0, gpio128_0);
             sendSignal("rs232", 0, RS232SC0_start);
+            qDebug() << "Sending START to RS232SC1";
+            writeToFile(RS232SC1_path, SC1_start_button1);
+            sendSignal("rs232", 1, RS232SC1_start);
+
+            WAITFORPROC(gpio130_path);
+            sendSignal("gpio", 2, gpio130_1);
+            qDebug() << "Sending STOP to RS232SC0";
+            writeToFile(RS232SC0_path, SC0_stop_button1);
+            sendSignal("rs232", 0, RS232SC0_stop);
+            writeToFile(gpio130_path, "0");
+            qDebug() << "Returning GPIO state: " << readFromFile(gpio130_path);
+            sendSignal("gpio", 2, gpio130_0);
         }
         break;
 
     case 2:
         while (!stopped) {
-            qDebug() << "Entering to wait loop. Selected algorithm 2";
-            while (readFromFile(gpio129_path) == "0") {
-                if (stopped) return;
-            }
-            qDebug() << "GPIO state: " << readFromFile(gpio129_path);
-            qDebug() << gpio129_path;
-            sendSignal("gpio", 1, gpio129_1);
+            WAITFORPROC(gpio128_path);
+            //qDebug() << "GPIO state: " << readFromFile(gpio128_path);
+            writeToFile(gpio128_path, "0");
+            qDebug() << "Returning GPIO state: " << readFromFile(gpio128_path);
+            sendSignal("gpio", 0, gpio128_1);
+            qDebug() << "Sending START to RS232SC1";
+            writeToFile(RS232SC1_path, SC1_start_button2);
+            sendSignal("rs232", 1, RS232SC1_start);
 
-            writeToFile(gpio129_path, "0");
-            qDebug() << "Returning GPIO state: " << readFromFile(gpio129_path);
             qDebug() << "Waiting for " << delayAT2 <<" mseconds";
             MyThread::msleep(delayAT2);
-            qDebug() << "Sending START to RS232";
-            writeToFile(RS232SC1_path, "START");
-            sendSignal("gpio", 1, gpio129_0);
-            sendSignal("rs232", 1, RS232SC1_start);
+
+            sendSignal("gpio", 0, gpio128_0);
+            qDebug() << "Sending START to RS232SC0";
+            writeToFile(RS232SC0_path, SC0_start_button2);
+            sendSignal("rs232", 0, RS232SC0_start);
+
+            WAITFORPROC(gpio130_path);
+            sendSignal("gpio", 2, gpio130_1);
+            qDebug() << "Sending STOP to RS232SC0";
+            writeToFile(RS232SC0_path, SC0_stop_button2);
+            sendSignal("rs232", 0, RS232SC0_stop);
+            writeToFile(gpio130_path, "0");
+            qDebug() << "Returning GPIO state: " << readFromFile(gpio130_path);
+            sendSignal("gpio", 2, gpio130_0);
         }
         break;
     case 3:
         while (!stopped) {
-            qDebug() << "Entering to wait loop. Selected algorithm 3";
-            while (readFromFile(gpio130_path) == "0") {
-                if (stopped) return;
-            }
-            qDebug() << "GPIO state: " << readFromFile(gpio130_path);
-            qDebug() << gpio130_path;
-            sendSignal("gpio", 2, gpio130_1);
+//            WAITFORPROC(gpio129_path);
+//            qDebug() << "GPIO state: " << readFromFile(gpio130_path);
+//            sendSignal("gpio", 2, gpio130_1);
+//            writeToFile(gpio130_path, "0");
+//            qDebug() << "Returning GPIO state: " << readFromFile(gpio130_path);
 
-            writeToFile(gpio130_path, "0");
-            qDebug() << "Returning GPIO state: " << readFromFile(gpio130_path);
-            qDebug() << "Waiting for " << delayAT3 <<" mseconds";
-            MyThread::msleep(delayAT3);
-            qDebug() << "Sending START to RS232";
-            writeToFile(RS232SC2_path, "START");
-            sendSignal("gpio", 2, gpio130_0);
-            sendSignal("rs232", 2, RS232SC2_start);
+//            qDebug() << "Waiting for " << delayAT3 <<" mseconds";
+//            MyThread::msleep(delayAT3);
+
+//            qDebug() << "Sending START to RS232";
+//            writeToFile(RS232SC2_path, SC0_start_button1);
+//            sendSignal("gpio", 2, gpio130_0);
+//            sendSignal("rs232", 2, RS232SC2_start);
         }
         break;
     }
 
+}
+
+bool Thread::waitForGPIO(const QString &gpio_path)
+{
+    qDebug() << "Entering to wait loop for " << gpio_path;
+    while (readFromFile(gpio_path) == "0") {
+        if (stopped) return false;
+    }
+    return true;
 }
 
 void Thread::sendSignal(const QString &op_type, const int &port_number, const QString &event_par)
@@ -182,6 +209,36 @@ void Thread::readSettings()
     RS232SC1_stop = conf.value("RS232SC1_stop").toString();
     RS232SC2_stop = conf.value("RS232SC2_stop").toString();
     RS232SC3_stop = conf.value("RS232SC3_stop").toString();
+
+    SC0_start_button1 = conf.value("SC0_start_button1").toString();
+    SC1_start_button1 = conf.value("SC1_start_button1").toString();
+    SC2_start_button1 = conf.value("SC2_start_button1").toString();
+    SC3_start_button1 = conf.value("SC3_start_button1").toString();
+
+    SC0_stop_button1 = conf.value("SC0_stop_button1").toString();
+    SC1_stop_button1 = conf.value("SC1_stop_button1").toString();
+    SC2_stop_button1 = conf.value("SC2_stop_button1").toString();
+    SC3_stop_button1 = conf.value("SC3_stop_button1").toString();
+
+    SC0_start_button2 = conf.value("SC0_start_button2").toString();
+    SC1_start_button2 = conf.value("SC1_start_button2").toString();
+    SC2_start_button2 = conf.value("SC2_start_button2").toString();
+    SC3_start_button2 = conf.value("SC3_start_button2").toString();
+
+    SC0_stop_button2 = conf.value("SC0_stop_button2").toString();
+    SC1_stop_button2 = conf.value("SC1_stop_button2").toString();
+    SC2_stop_button2 = conf.value("SC2_stop_button2").toString();
+    SC3_stop_button2 = conf.value("SC3_stop_button2").toString();
+
+    SC0_start_button3 = conf.value("SC0_start_button3").toString();
+    SC1_start_button3 = conf.value("SC1_start_button3").toString();
+    SC2_start_button3 = conf.value("SC2_start_button3").toString();
+    SC3_start_button3 = conf.value("SC3_start_button3").toString();
+
+    SC0_stop_button3 = conf.value("SC0_stop_button3").toString();
+    SC1_stop_button3 = conf.value("SC1_stop_button3").toString();
+    SC2_stop_button3 = conf.value("SC2_stop_button3").toString();
+    SC3_stop_button3 = conf.value("SC3_stop_button3").toString();
 
     delayAT1 = conf.value("delayAT1").toULongLong();
     delayAT2 = conf.value("delayAT2").toULongLong();
