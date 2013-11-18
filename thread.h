@@ -95,7 +95,7 @@ private:
     void sendSignal(const QString &op_type);
 
     bool waitForGPIO(const QString &gpio_path);
-    QString readFromGPIO(const QString &filename);
+//    QString readFromGPIO(const QString &filename);
 
     void writeSettings();
     void readSettings();

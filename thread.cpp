@@ -28,6 +28,13 @@ void Thread::setAlgorithm(const int &number)
 void Thread::run()
 {
     stopped = false;
+    sendSignal("gpio", 0, gpio128_0);
+    sendSignal("gpio", 1, gpio129_0);
+    sendSignal("gpio", 2, gpio130_0);
+    sendSignal("gpio", 3, gpio131_0);
+    sendSignal("gpio", 4, gpio132_0);
+    sendSignal("gpio", 5, gpio133_0);
+    sendSignal("gpio", 6, gpio134_0);
 
     qDebug() << "Selected algorithm " << algorithmNumber;
     switch (algorithmNumber) {
@@ -115,29 +122,29 @@ bool Thread::waitForGPIO(const QString &gpio_path)
 {
     qDebug() << "Entering to wait loop for " << gpio_path;
     sendSignal("showStat", 0, "Entering to wait loop for " + gpio_path);
-    while (readFromGPIO(gpio_path) == "0") {
+    while (readFromFile(gpio_path) == "0") {
         if (stopped) return false;
     }
     //sendSignal("showStat", 0, "");
     return true;
 }
 
-QString Thread::readFromGPIO(const QString &filename)
-{
-    char ch;
-    ifstream gpioFile(filename.toAscii());
-    if (!gpioFile) {
-        //        qDebug() << "Can't to open file " << filename;
-        //        stopped = true;
-        //        sendSignal("fatalAbort");
-        return "";
-    }
-    gpioFile.get(ch);
+//QString Thread::readFromGPIO(const QString &filename)
+//{
+//    char ch;
+//    ifstream gpioFile(filename.toAscii());
+//    if (!gpioFile) {
+//        //        qDebug() << "Can't to open file " << filename;
+//        //        stopped = true;
+//        //        sendSignal("fatalAbort");
+//        return "";
+//    }
+//    gpioFile.get(ch);
 
-    QString fileContent(1, ch);
-    return fileContent;
+//    QString fileContent(1, ch);
+//    return fileContent;
 
-}
+//}
 
 void Thread::sendSignal(const QString &op_type, const int &port_number, const QString &event_par)
 {
