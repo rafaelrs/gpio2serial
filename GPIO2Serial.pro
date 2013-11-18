@@ -14,13 +14,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    thread.cpp \
-    proba.cpp
+    thread.cpp
 
 HEADERS  += mainwindow.h \
     myevent.h \
-    thread.h \
-    proba.h
+    thread.h
 
 FORMS    += mainwindow.ui
 

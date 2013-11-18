@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    showGPIOImage("1.128.gif", 6);
 }
 
 MainWindow::~MainWindow()

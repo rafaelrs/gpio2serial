@@ -11,7 +11,7 @@
 #include <QCoreApplication>
 using namespace std;
 
-#define WAITFORPROC(waitSignal) if (!waitForGPIO(waitSignal)) continue
+#define WAITFORPROC(waitSignal) if (!waitForGPIO(waitSignal)) return
 
 struct MyThread : public QThread { using QThread::msleep;};
 
@@ -34,14 +34,13 @@ void Thread::run()
     sendSignal("gpio", 3, gpio131_0);
     sendSignal("gpio", 4, gpio132_0);
     sendSignal("gpio", 5, gpio133_0);
-    sendSignal("gpio", 6, gpio134_0);
+//    sendSignal("gpio", 6, gpio134_0);
 
     qDebug() << "Selected algorithm " << algorithmNumber;
     switch (algorithmNumber) {
     case 1:
         while (!stopped) {
-//            WAITFORPROC(gpio128_path);
-            if (!waitForGPIO(gpio128_path)) continue;
+            WAITFORPROC(gpio128_path);
             //qDebug() << "GPIO state: " << readFromFile(gpio128_path);
 //            writeToFile(gpio128_path, "0");
 //            qDebug() << "Returning GPIO state: " << readFromFile(gpio128_path);
@@ -126,26 +125,9 @@ bool Thread::waitForGPIO(const QString &gpio_path)
     while (readFromFile(gpio_path) == "0") {
         if (stopped) return false;
     }
-    //sendSignal("showStat", 0, "");
+    if (stopped) return false;
     return true;
 }
-
-//QString Thread::readFromGPIO(const QString &filename)
-//{
-//    char ch;
-//    ifstream gpioFile(filename.toAscii());
-//    if (!gpioFile) {
-//        //        qDebug() << "Can't to open file " << filename;
-//        //        stopped = true;
-//        //        sendSignal("fatalAbort");
-//        return "";
-//    }
-//    gpioFile.get(ch);
-
-//    QString fileContent(1, ch);
-//    return fileContent;
-
-//}
 
 void Thread::sendSignal(const QString &op_type, const int &port_number, const QString &event_par)
 {
@@ -161,17 +143,16 @@ void Thread::sendSignal(const QString &op_type)
 
 QString Thread::readFromFile(const QString &filename)
 {
-//    QFile gpioFile(filename);
-    QFile gpioFile("/sys/class/gpio/gpio128");
+    QFile gpioFile(filename);
     if (gpioFile.open(QIODevice::ReadOnly)) {
         QTextStream gpioStream(&gpioFile);
         QString fileContent = gpioStream.read(1);
         gpioFile.close();
         return fileContent;
     } else {
-//        qDebug() << "Can't to open file " << filename;
-//        stopped = true;
-//        sendSignal("fatalAbort");
+        qDebug() << "Can't to open file " << filename;
+        stopped = true;
+        sendSignal("fatalAbort");
     }
 
     return "";
