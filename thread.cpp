@@ -40,7 +40,8 @@ void Thread::run()
     switch (algorithmNumber) {
     case 1:
         while (!stopped) {
-            WAITFORPROC(gpio128_path);
+//            WAITFORPROC(gpio128_path);
+            if (!waitForGPIO(gpio128_path)) continue;
             //qDebug() << "GPIO state: " << readFromFile(gpio128_path);
 //            writeToFile(gpio128_path, "0");
 //            qDebug() << "Returning GPIO state: " << readFromFile(gpio128_path);
@@ -160,7 +161,8 @@ void Thread::sendSignal(const QString &op_type)
 
 QString Thread::readFromFile(const QString &filename)
 {
-    QFile gpioFile(filename);
+//    QFile gpioFile(filename);
+    QFile gpioFile("/sys/class/gpio/gpio128");
     if (gpioFile.open(QIODevice::ReadOnly)) {
         QTextStream gpioStream(&gpioFile);
         QString fileContent = gpioStream.read(1);
