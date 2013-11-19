@@ -121,10 +121,12 @@ void Thread::run()
 bool Thread::waitForGPIO(const QString &gpio_path)
 {
     qDebug() << "Entering to wait loop for " << gpio_path;
+    QString tempStr;
     sendSignal("showStat", 0, "Entering to wait loop for " + gpio_path);
-    while (readFromFile(gpio_path) == "0") {
+    while (tempStr = readFromFile(gpio_path) == "1") {
         if (stopped) return false;
     }
+    qDebug() << tempStr;
     if (stopped) return false;
     return true;
 }
@@ -150,9 +152,9 @@ QString Thread::readFromFile(const QString &filename)
         gpioFile.close();
         return fileContent;
     } else {
-        qDebug() << "Can't to open file " << filename;
-        stopped = true;
-        sendSignal("fatalAbort");
+        //qDebug() << "Can't to open file " << filename;
+        //stopped = true;
+        //sendSignal("fatalAbort");
     }
 
     return "";
