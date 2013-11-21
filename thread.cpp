@@ -121,12 +121,12 @@ void Thread::run()
 bool Thread::waitForGPIO(const QString &gpio_path)
 {
     qDebug() << "Entering to wait loop for " << gpio_path;
-    QString tempStr;
+//    QString tempStr;
     sendSignal("showStat", 0, "Entering to wait loop for " + gpio_path);
-    while (tempStr = readFromFile(gpio_path) == "1") {
+    while (readFromFile(gpio_path) == "1") {
         if (stopped) return false;
     }
-    qDebug() << tempStr;
+//    qDebug() << tempStr;
     if (stopped) return false;
     return true;
 }
